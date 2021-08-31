@@ -43,22 +43,6 @@
 		opacity: 1,
 		fillOpacity: 0.8};
 
-	fetch("data/sites.geojson")
-
-		.then(function(response) {
-			return response.json();
-			})
-		
-		.then(function(data) {
-		
-			L.geoJSON(data, {
-				pointToLayer: function (feature, latlng) {
-					return L.circleMarker(latlng, geojsonMarkerOptions);
-					}
-			})	
-		.addTo(map);			
-		});
-
     </script>
 	
 	

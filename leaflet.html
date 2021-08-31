@@ -23,11 +23,6 @@
 
 <body>
     <div id="map"></div> <!-- div groups set of elements together in one block-level box -->
-	<div id="text">
-    <textarea id="geojsontext"></textarea>
-    <input type="button" id="submit" value="Submit">
-	</div>
-	
 	
     <script>
 	
@@ -45,22 +40,7 @@
 		weight: 1,
 		opacity: 1,
 		fillOpacity: 0.8};
-		
-	fetch("data/sites.geojson")
-
-		.then(function(response) {
-			return response.json();
-			})
-		
-		.then(function(data) {
-		
-			L.geoJSON(data, {
-				pointToLayer: function (feature, latlng) {
-					return L.circleMarker(latlng, geojsonMarkerOptions);
-					}
-			})		
-			.addTo(map);
-		});
+	
 	
 
     </script>

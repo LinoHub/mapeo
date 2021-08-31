@@ -1,0 +1,73 @@
+<!DOCTYPE html> <!-- Specifies the version of HTML, in this case HTML5 -->
+<html>
+
+<!-- This is a comment -->
+<head>
+    <title>Basic map</title>
+	<meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"> <!-- Meta uses both a name and a content for an attribute -->
+    <link rel="stylesheet" href="css/leaflet.css"> <!-- External CSS Code, rel needs the value stylesheet and href tells the location -->
+    <script src="js/leaflet.js"></script> <!-- JavaScript Code -->
+    <style> <!-- Embedded CSS Code -->
+        html, body {
+			height: 100%;
+			margin: 0;
+			padding: 0;
+		} 
+		#map { 
+			width: 100%;
+			height: 100%;
+			float: left;
+		}
+    </style>
+</head>
+
+
+<body>
+    <div id="map"></div> <!-- div groups set of elements together in one block-level box -->
+	<div id="text">
+    <textarea id="geojsontext"></textarea>
+    <input type="button" id="submit" value="Submit">
+	</div>
+	
+	
+    <script>
+	
+	let map = L.map("map").setView([40.41, -3.7], 13);
+		
+	L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", 
+				{attribution: '&copy; <a href="http://' + 
+				'www.openstreetmap.org/copyright">OpenStreetMap</a>'})
+				.addTo(map); // This is a JS comment // 
+
+	var geojsonMarkerOptions = 
+		{radius: 8,
+		fillColor: "#ff7800",
+		color: "#000",
+		weight: 1,
+		opacity: 1,
+		fillOpacity: 0.8};
+		
+	fetch("data/sites.geojson")
+
+		.then(function(response) {
+			return response.json();
+			})
+		
+		.then(function(data) {
+		
+			L.geoJSON(data, {
+				pointToLayer: function (feature, latlng) {
+					return L.circleMarker(latlng, geojsonMarkerOptions);
+					}
+			})		
+			.addTo(map);
+		});
+	
+
+    </script>
+	
+	
+</body>
+</html>
+

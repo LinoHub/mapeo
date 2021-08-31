@@ -9,25 +9,20 @@
     <link rel="stylesheet" href="css/leaflet.css"> <!-- External CSS Code, rel needs the value stylesheet and href tells the location -->
     <script src="js/leaflet.js"></script> <!-- JavaScript Code -->
     <style> <!-- Embedded CSS Code -->
-        html, body {
-			height: 100%;
-			margin: 0;
-			padding: 0;
-		} 
-		#map { 
-			width: 100%;
-			height: 100%;
-			float: left;
-		}
+        body {
+            padding: 0;
+            margin: 0;
+        }
+        html, body, #map {
+            height: 100%;
+            width: 100%;
+        }
     </style>
 </head>
 
 
 <body>
     <div id="map"></div> <!-- div groups set of elements together in one block-level box -->
-	<div id="text">
-    <textarea id="geojsontext"></textarea>
-    <input type="button" id="submit" value="Submit">
 	</div>
 	
 	
@@ -47,7 +42,7 @@
 		weight: 1,
 		opacity: 1,
 		fillOpacity: 0.8};
-		
+
 	fetch("data/sites.geojson")
 
 		.then(function(response) {
@@ -60,14 +55,12 @@
 				pointToLayer: function (feature, latlng) {
 					return L.circleMarker(latlng, geojsonMarkerOptions);
 					}
-			})		
-			.addTo(map);
+			})	
+		.addTo(map);			
 		});
-	
 
     </script>
 	
 	
 </body>
 </html>
-

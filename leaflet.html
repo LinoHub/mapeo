@@ -6,8 +6,21 @@
     <title>Basic map</title>
 	<meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"> <!-- Meta uses both a name and a content for an attribute -->
+	
+	<!-- Leaflet -->
     <link rel="stylesheet" href="css/leaflet.css"> <!-- External CSS Code, rel needs the value stylesheet and href tells the location -->
-    <script src="js/leaflet.js"></script> <!-- JavaScript Code -->
+	<script src="js/leaflet.js"></script> <!-- JavaScript Code -->
+	
+	
+	<!-- Awesome markers -->
+	<link rel="stylesheet" href="http://code.ionicframework.com/ionicons/1.5.2/css/ionicons.min.css">
+	<link rel="stylesheet" href="css/leaflet.awesome-markers.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.css" />
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.min.js"></script>
+	<script src="js/leaflet.ajax.min.js"></script>
+	<script src="js/leaflet.awesome-markers.js"></script>
+	
     <style>
         body {
             padding: 0;
@@ -33,6 +46,24 @@
             line-height: 15px;
             padding-left: 20px;
         }
+		.info {
+			padding: 6px 8px;
+			font: 14px/16px Arial, Helvetica, sans-serif;
+			background: rgba(255,255,255,0.8);
+			box-shadow: 0 0 15px rgba(0,0,0,0.2);
+			border-radius: 5px;
+			width: 10em;
+			height: 10em;
+		}
+		.info h4 {
+			margin: 0 0 5px;
+			color: #777777;
+		}
+		.info #currentMunicipios {
+			margin: 6px 0;
+		}
+		.info #currentDistritos {
+			margin: 6px 0;
     </style>
 </head>
 
@@ -46,9 +77,200 @@
 // Tile layer
 let osm = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'});
 let imagery = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'});
+let stoner = L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/toner/{z}/{x}/{y}{r}.{ext}', {
+	attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+	subdomains: 'abcd',
+	minZoom: 0,
+	maxZoom: 20,
+	ext: 'png'
+});
 
 // Map
-let map = L.map('map', {center: [40.41, -3.7], zoom: 13, layers: imagery});
+let map = L.map('map', {center: [40.41, -3.7], zoom: 13, layers: stoner});
+
+// HIGHLIGHT FUNCTIONS 
+
+// Information box
+let info = L.control({position: "topright"});
+info.onAdd = function() {
+    let div = L.DomUtil.create("div", "info");
+    div.innerHTML = '<h4>Municipios de Madrid</h4><p id="currentMunicipios"></p><br><h4>Distritos de Madrid</h4><p id="currentDistritos">';
+    return div;
+};
+info.addTo(map);
+
+// Highlight functions
+let geojson_dis; 
+let geojson_mun;
+let info_mun = document.getElementById("currentMunicipios");
+let info_dis = document.getElementById("currentDistritos");
+
+let highlightStyle = {
+    weight: 5,
+    color: "black",
+    fillOpacity: 0.5
+};
+
+function highlightFeature(e) {
+    e.target.setStyle(highlightStyle);
+    e.target.bringToFront();
+    info_mun.innerHTML =
+        e.target.feature.properties.NAMEUNIT;
+	info_dis.innerHTML =
+        e.target.feature.properties.NOMDIS;
+}
+
+function resetHighlight(e) {
+    geojson_mun.resetStyle(e.target);
+    info_mun.innerHTML = "";
+}
+
+
+// Function for random colors style
+function style(feature) {
+    return {
+        weight: 2,
+        opacity: 1,
+        color: 'white',
+        dashArray: '3',
+        fillOpacity: 0.4,
+        fillColor: '#'+(0x1000000+(Math.random())*0xffffff).toString(16).substr(1,6)
+    };
+}
+
+
+
+// FUNCTIONS AND FETCH OF MUNICIPIOS DISTRITOS & OVERLAY 
+
+// Function for random colors style
+function style_layer(feature) {
+    return {
+        weight: 2,
+        opacity: 1,
+        color: 'white',
+        dashArray: '3',
+        fillOpacity: 0.7,
+        fillColor: '#'+(0x1000000+(Math.random())*0xffffff).toString(16).substr(1,6)
+    };
+}
+
+// OverlayMaps
+let baseMaps = {
+    "Stoner": stoner,
+	"OSM": osm,
+	"Imagery": imagery
+};
+let punto = L.marker([40.91, -3.1]).bindPopup('Soy un puntazo');
+let overlayMaps = {
+    "Puntazo": punto
+};
+let control = L.control.layers(baseMaps, overlayMaps, {
+			position: 'topright', // 'topleft', 'bottomleft', 'bottomright'
+			collapsed: false // true
+		}).addTo(map);
+control.removeLayer(punto);
+
+
+
+// Add the municipios of Madrid
+fetch("data/municipios.geojson")
+    .then(function(response) {
+        return response.json();
+    })
+    .then(function(data) {
+        geojson_mun = L.geoJSON(data, {
+			style: style,
+			onEachFeature: function(feature, layer) {
+                layer.addEventListener("mouseover", highlightFeature);
+                layer.addEventListener("mouseout", resetHighlight);
+				var popupText = "<b>" + feature.properties.NAMEUNIT + "<br>";
+				layer.bindPopup(popupText);
+            }
+		}).addTo(map);
+		let overlayMaps = {
+			"Municipios": geojson_mun
+		};
+		let control_mun = L.control.layers(baseMaps, overlayMaps, {
+			position: 'topleft', // 'topleft', 'bottomleft', 'bottomright'
+			collapsed: false // true
+		}).addTo(map);
+		control_mun.removeLayer(stoner);
+		control_mun.removeLayer(osm);
+		control_mun.removeLayer(imagery);
+    });
+
+// Add the district of Madrid
+let distritos = fetch("data/distritos.geojson")
+    .then(function(response) {
+        return response.json();
+    })
+    .then(function(data) {
+        geojson_dis = L.geoJSON(data, {
+			style: style,
+			onEachFeature: function(feature, layer) {
+                layer.addEventListener("mouseover", highlightFeature);
+                layer.addEventListener("mouseout", resetHighlight);
+				var popupText = "<b>" + feature.properties.NOMDIS + "<br>";
+				layer.bindPopup(popupText);	
+			}
+		}).addTo(map);
+		let overlayMaps = {
+			"Distritos M": geojson_dis
+		};
+		let control_dis = L.control.layers(baseMaps, overlayMaps, {
+			position: 'topleft', // 'topleft', 'bottomleft', 'bottomright'
+			collapsed: false // true
+		}).addTo(map);
+		control_dis.removeLayer(stoner);
+		control_dis.removeLayer(osm);
+		control_dis.removeLayer(imagery);
+    });
+
+// FUNCTIONS AND FETCH OF SITES 
+
+// Function of style of sites 
+function styles_sites(feature, latlng) {
+				if (feature.properties.tipo === "Libreria") {
+				return L.marker(latlng, {
+					icon: L.AwesomeMarkers.icon({icon: 'book', iconColor: 'black', markerColor: 'red', prefix: 'fa'}) 
+				});
+				} 
+				else if (feature.properties.tipo === "CSOA") {
+				  return L.marker(latlng, {
+					icon: L.AwesomeMarkers.icon({icon: 'users', iconColor: 'black', markerColor: 'blue', prefix: 'fa'}) 
+				  });
+				}
+				else if (feature.properties.tipo === "Huerto") {
+				  return L.marker(latlng, {
+					icon: L.AwesomeMarkers.icon({icon: 'tree', iconColor: 'black', markerColor: 'green', prefix: 'fa'}) 
+				  });
+				}
+				else if (feature.properties.tipo === "NGO") {
+				  return L.marker(latlng, {
+					icon: L.AwesomeMarkers.icon({icon: 'globe', iconColor: 'black', markerColor: 'pink', prefix: 'fa'}) 
+				  });
+				}
+				else if (feature.properties.tipo === "CSA") {
+				  return L.marker(latlng, {
+					icon: L.AwesomeMarkers.icon({icon: 'users', iconColor: 'black', markerColor: 'darkblue', prefix: 'fa'}) 
+				  });
+				}
+			};
+
+
+// Function of popup of sites
+
+function popup(feature, layer) {
+				layer.bindPopup("<b>Nombre: </b>"+feature.properties.nombre+"<br><b>Barrio: </b>"+feature.properties.barrio+"<br><b>Tipo: </b>"+feature.properties.tipo+"<br><b>Ubicacion: </b>"+feature.properties.ubicacion);
+			};
+			
+function popup2(feature, layer) {
+				layer.on('mouseover', function() { layer.openPopup(layer.bindPopup("<b>"+feature.properties.nombre+"</b>"))});
+                layer.on('mouseout', function() { layer.closePopup(); });
+				layer.on('click', function (feature, layer) {
+					layer.bindPopup("<b>Nombre: </b>"+feature.properties.nombre+"<br><b>Barrio: </b>"+feature.properties.barrio+"<br><b>Tipo: </b>"+feature.properties.tipo+"<br><b>Ubicacion: </b>"+feature.properties.ubicacion);
+				});
+			};
 
 // GeoJSON Markers
 var geojsonMarkerOptions = 
@@ -58,14 +280,55 @@ var geojsonMarkerOptions =
 	weight: 1,
 	opacity: 1,
 	fillOpacity: 0.8};
-
-// Basemap Layer control
-let baseMaps = {
-    "OSM": osm,
-    "Imagery": imagery
-};
-L.control.layers(baseMaps).addTo(map);
 	
+
+    // Fetch the GeoJSON sites
+async function getData() {
+	const response = await fetch("data/sites.geojson");
+	const sites = await response.json();
+	return sites;
+}
+
+var categories = {},
+      category;
+
+var layersControl = L.control.layers(null, null,{
+	position: 'topright', // 'topleft', 'bottomleft', 'bottomright'
+	collapsed: false // true
+} ).addTo(map);
+
+let sites = getData()
+	.then((function(data) {
+		L.geoJSON(data, {
+			pointToLayer: styles_sites,
+			onEachFeature: function LayerControl(feature, layer) {
+				var popupText = "<b>" + feature.properties.nombre + "<br>";
+				layer.bindPopup(popupText);
+				category = feature.properties.tipo;
+         		 // Initialize the category array if not already set.
+				if (typeof categories[category] === "undefined") {
+					categories[category] = L.layerGroup().addTo(map);
+					layersControl.addOverlay(categories[category], category);
+        		}	
+          		categories[category].addLayer(layer);
+				layer.on('mouseover', function() { 
+					layer.openPopup(layer.bindPopup("<b>"+feature.properties.nombre+"</b>"))
+				});
+				layer.on('mouseout', function() { 
+					layer.closePopup(); 
+				});
+				layer.on('click', function () {
+					layer.bindPopup("<b>Nombre: </b>"+feature.properties.nombre+"<br><b>Barrio: </b>"+feature.properties.barrio+"<br><b>Tipo: </b>"+feature.properties.tipo+"<br><b>Ubicacion: </b>"+feature.properties.ubicacion+"<br><b>Correo: </b>"+feature.properties.contacto);
+				});
+        	}
+		}).addTo(map);
+	}));
+
+// OTHER MAP FEATURES 
+
+
+	
+
 
     </script>
 	

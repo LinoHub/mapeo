@@ -654,4 +654,58 @@ svg.leaflet-image-layer.leaflet-interactive path {
     margin: auto;
     display: block;
 	}
-
+.info {
+    padding: 6px 8px;
+    font: 14px/16px Arial, Helvetica, sans-serif;
+    background: rgba(255,255,255,0.8);
+    box-shadow: 0 0 15px rgba(0,0,0,0.2);
+    border-radius: 5px;
+    width: 10em;
+}
+.info h4 {
+    margin: 0 0 5px;
+    color: #777777;
+}
+.info #currentTown {
+    margin: 6px 0;
+}
+.legend {
+	color: #333;
+	font-family: 'Open Sans', Helvetica, sans-serif;
+	padding: 6px 21px 6px 21px;
+	background-color: #fff;
+	box-shadow: 0 0 15px rgba(0,0,0,0.2);
+	border: 2px solid rgba(0,0,0,0.2);
+	border-radius: 5px;
+}
+.legend h3 {
+	line-height: 5px;
+}
+.legend ul {
+	line-height: 15px;
+	padding-left: 20px;
+}
+.info {
+	padding: 6px 8px;
+	font: 14px/16px Arial, Helvetica, sans-serif;
+	background: rgba(255,255,255,0.8);
+	box-shadow: 0 0 15px rgba(0,0,0,0.2);
+	border-radius: 5px;
+	width: 10em;
+	height: 10em;
+}
+.info h4 {
+	margin: 0 0 5px;
+	color: #777777;
+}
+.info #currentMunicipios {
+	margin: 6px 0;
+}
+.info #currentDistritos {
+	margin: 6px 0;
+	.toggle {
+	background: orange !important;
+}
+.toggle:hover{
+	background: darkorange !important;
+}

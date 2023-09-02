@@ -12,7 +12,7 @@ let stoner = L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/toner/{z}/{x
 });
 
 // Map
-let map = L.map('map', {center: [40.41, -3.7], zoom: 8, layers: stoner});
+let map = L.map('map', {center: [40.41, -3.7], zoom: 13, layers: stoner});
 
 // Minimap
 var osmUrl='http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';

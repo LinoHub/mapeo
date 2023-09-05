@@ -119,6 +119,101 @@
         .bd-mode-toggle {
           z-index: 1500;
         }
+
+
+
+          /* Style for the map container */
+          #map-container {
+              position: relative;
+              height: 500px; /* Adjust the height as needed */
+          }
+
+          /* Style for the buttons container */
+          #buttons {
+              position: absolute;
+              top: 10%; /* Center vertically */
+              left: 50%; /* Center horizontally */
+              transform: translate(-50%, -50%); /* Center the container itself */
+              z-index: 1000;
+          }
+
+          /* Style for the rectangle background */
+          #buttons::before {
+              content: ''; /* Add empty content for the pseudo-element */
+              position: absolute;
+              top: -5px; /* Adjust the top position to cover the buttons */
+              right: -5px; /* Adjust the right position to cover the buttons */
+              bottom: -5px; /* Adjust the bottom position to cover the buttons */
+              left: -5px; /* Adjust the left position to cover the buttons */
+              background-color: #3498db; /* Background color of the rectangle */
+              border-radius: 10px; /* Rounded corners */
+              z-index: -1; /* Position the rectangle behind the buttons */
+          }
+
+          /* Style for the buttons */
+          .custom-button {
+              background-color: transparent; /* Make the buttons transparent */
+              color: #fff;
+              border: none;
+              padding: 10px 20px;
+              font-size: 16px;
+              cursor: pointer;
+              transition: background-color 0.3s ease;
+              z-index: 1; /* Position the buttons above the rectangle */
+          }
+
+          /* Hover effect */
+          .custom-button:hover {
+              background-color: #2980b9;
+          }
+
+          /* Style for marker details */
+         /* Style for marker details */
+        .marker-details {
+          margin-top: 10px;
+          text-align: left; /* Align text to the left */
+        }
+
+        .marker-description {
+          margin-top: 10px;
+          text-align: left; /* Align text to the left */
+        }
+
+        .marker-details p {
+          margin-bottom: 5px;
+          text-align: left; /* Align text to the left */
+        }
+
+        .marker-details strong {
+          font-weight: bold;
+          text-align: left; /* Align text to the left */
+        }
+
+        /* Style for communication link */
+        #marker-communication {
+          color: #3498db;
+          text-decoration: none;
+        }
+
+        #marker-communication:hover {
+          text-decoration: underline;
+        }
+
+        /* Style for the project name */
+        #marker-name {
+          font-size: 30px; /* Set the desired font size */
+          font-weight: normal; /* Remove bold font-weight */
+          font-family: "Your Desired Font", sans-serif; /* Replace "Your Desired Font" with the actual font you want to use */
+          color: inherit; /* Inherit the text color from parent */
+        }
+
+        /* Style for the "Project Information" pane header */
+        .sidebar-header {
+          font-size: 22px; /* Set the desired font size */
+          font-family: "Your Desired Font", sans-serif; /* Replace "Your Desired Font" with the actual font you want to use */
+          font-weight: normal; /* Remove bold font-weight */
+        }
+
       </style>
 
 </head>
@@ -204,42 +299,26 @@
 
             </div>
 
-            <div class="sidebar-pane" id="profile">
-                <h1 class="sidebar-header">Profile<span class="sidebar-close"><i class="fa fa-caret-left"></i></span></h1>
-            </div>
-
-            <div class="sidebar-pane" id="messages">
-                <h1 class="sidebar-header">Messages<span class="sidebar-close"><i class="fa fa-caret-left"></i></span></h1>
-            </div>
-
-            <div class="sidebar-pane" id="settings">
-                <h1 class="sidebar-header">Settings<span class="sidebar-close"><i class="fa fa-caret-left"></i></span></h1>
-            </div>
 
             <div id="marker-content" class="sidebar-pane">
               <h1 class="sidebar-header">Project Information<span class="sidebar-close"><i class="fa fa-caret-left"></i></span></h1>
               <div class="marker-info">
                 <h2 id="marker-name"></h2>
-                <p id="marker-description"></p>
-                <p id="marker-location"></p>
-                <p id="marker-description"></p>
-                <p id="marker-line"></p>
-                <p id="marker-timeframe"></p>
-                <p id="marker-methodology"></p>
-                <p id="marker-communication"></p>
-                <p id="marker-people"></p>
+                <div class="marker-details">
+                  <p><strong>Location:</strong> <span id="marker-location"></span></p>
+                  <p><strong>Research Line:</strong> <span id="marker-line"></span></p>
+                  <p><strong>Timeframe:</strong> <span id="marker-timeframe"></span></p>
+                  <p><strong>Methodology:</strong> <span id="marker-methodology"></span></p>
+                  <p><strong>Communication:</strong> <a href="#" id="marker-communication" target="_blank"></a></p>
+                  <p><strong>People:</strong> <span id="marker-people"></span></p>
+                </div>
+                <p class="marker-description" id="marker-description"></p>
+              </div>
             </div>
-            </div>
+            
         </div>
     </div>
 
-    <!-- <div id="marker-content" class="sidebar-pane">
-      <h1 class="sidebar-header">Marker Information<span class="sidebar-close"><i class="fa fa-caret-left"></i></span></h1>
-      <div class="marker-info">
-          <h2 id="marker-name"></h2>
-          <p id="marker-description"></p>
-      </div>
-  </div> -->
   
 
 	<h1 class="visually-hidden">Mapeo de Madrid</h1>
@@ -249,9 +328,19 @@
       </div> -->
 
       
+      <div id="map-container">
+        <div id="map" class="sidebar-map"></div>
+          <div id="buttons">
+            <button class="custom-button" onclick="changeCenterAndZoom('basqueCountry')">Basque Country</button>
+            <button class="custom-button" onclick="changeCenterAndZoom('spain')">Spain</button>
+            <button class="custom-button" onclick="changeCenterAndZoom('europe')">Europe</button>
+            <button class="custom-button" onclick="changeCenterAndZoom('world')">World</button>
+        </div>
+    </div>
 
    <!-- <div id="map"></div> div groups set of elements together in one block-level box -->
-   <div id="map" class="sidebar-map"></div>
+   <!-- <div id="map" class="sidebar-map"></div> -->
+
 
    <script src="../js/leaflet-sidebar.js"></script>
    <!-- <script src = '../js/leaflet_map_bc3_test.js'></script> -->
@@ -273,7 +362,7 @@
     });
 
     // Map
-    let map = L.map('map', {center: [40.41, -3.7], zoom: 6, layers: osm});
+    let map = L.map('map', {center: [43.1, -2.3], zoom: 8, layers: osm});
 
     // Add Tile Layers to Layer Control
     const baseLayers = {
@@ -293,16 +382,16 @@
     // Sample data with marker information
     const data = [
         {
-            name: 'Title 1',  
-            location: 'Location 1',
-            lat: 40.41,
-            lon: -3.7,
-            description: 'Description 1',
-            line: 'Research Line 1',
-            timeframe: 'Time frame',
-            methodology: 'Methodology 1',
-            communication: 'Website',
-            people: 'People 1, 2, 3'
+            name: 'SWITCH',  
+            location: 'Europe (Hub based in Donosti, Basque Country)',
+            lat: 43.31283,
+            lon: -1.97499,
+            description: 'SWITCH is a four year research project that aims to accelerate the behavioural shift of European citizens towards more sustainable and healthy patterns, using research and innovation as a driver to increase knowledge, accessibility, and facilitation strategies at all levels of the food systems. The SWITCH project has been funded by the Horizon Europe funding programme for research and innovation. It aims to tackle climate change, helps to achieve the UN’s Sustainable Development Goals and boosts the EU’s competitiveness and growth.',
+            line: 'Research Line 2 & 3',
+            timeframe: 'January 23- December 26',
+            methodology: 'Different activities will be test to identify regional drivers to transition to more sustainable diets at large scale',
+            communication: 'https://switchdiet.eu/',
+            people: 'Inma Batalla, MJ Sanz, Víctor Martínez, Iñaki Arto, Neus Escobar, Rebeca,'
         },
         {
             name: 'Title 2',  
@@ -347,20 +436,53 @@ data.forEach(item => {
         const markerCommunicationElement = document.getElementById('marker-communication');
         const markerPeopleElement = document.getElementById('marker-people');
 
-        
-        markerNameElement.textContent = item.name; // Replace item.name with the appropriate marker property
-        markerDescriptionElement.textContent = item.description; // Replace item.description with the appropriate marker property
+        markerNameElement.textContent = item.name;
+        markerDescriptionElement.textContent = item.description;
         markerLocationElement.textContent = item.location;
         markerLineElement.textContent = item.line;
         markerTimeframeElement.textContent = item.timeframe;
         markerMethodologyElement.textContent = item.methodology;
-        markerCommunicationElement.textContent = item.communication;
+        markerCommunicationElement.textContent = 'Website';
+        markerCommunicationElement.href = item.communication;
         markerPeopleElement.textContent = item.people;
+
 
         isSidebarOpen = true;
     }
 });
 });
+
+
+
+function changeCenterAndZoom(option) {
+    let newCenter;
+    let newZoom;
+
+    switch (option) {
+        case 'basqueCountry':
+            newCenter = [43.1, -2.3]; // Basque Country coordinates
+            newZoom = 8;
+            break;
+        case 'spain':
+            newCenter = [40.4168, -3.7038]; // Spain coordinates
+            newZoom = 6;
+            break;
+        case 'europe':
+            newCenter = [50.8503, 4.3517]; // Europe coordinates (Brussels)
+            newZoom = 4;
+            break;
+        case 'world':
+        default:
+            newCenter = [20, 0]; // Center of the world (default)
+            newZoom = 2;
+            break;
+    }
+
+    map.setView(newCenter, newZoom);
+}
+
+
+document.getElementById('centerButton').addEventListener('click', changeCenterAndZoom);
 
 
    

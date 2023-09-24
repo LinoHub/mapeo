@@ -442,11 +442,7 @@ data.forEach(item => {
 
     marker.on('click', function () {
     // Check the state of the sidebar
-    if (isSidebarOpen) {
-        // Close the sidebar
-        sidebar.close();
-        isSidebarOpen = false;
-    } else {
+    
         // Show the sidebar when a marker is clicked
         sidebar.open('marker-content');
 
@@ -472,8 +468,7 @@ data.forEach(item => {
 
 
         isSidebarOpen = true;
-    }
-});
+    });
 });
 
 
